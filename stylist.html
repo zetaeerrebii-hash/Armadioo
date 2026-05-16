@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARMADIO AI</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #f5f0e8;
+  --warm: #e8ddd0;
+  --dark: #1a1612;
+  --brown: #3d2b1f;
+  --gold: #c9a96e;
+  --gold-light: #e8c98a;
+  --muted: #8a7968;
+  --accent: #7a4f3a;
+  --surface: #fff9f2;
+  --border: #d4c4b0;
+  --shadow: rgba(58, 38, 20, 0.12);
+}
+
+body {
+  background: var(--cream);
+  color: var(--dark);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(201,169,110,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(122,79,58,0.08) 0%, transparent 60%);
+}
+
+/* ── Header ── */
+header {
+  text-align: center;
+  padding: 40px 24px 24px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface) 0%, transparent 100%);
+}
+
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 10vw, 5rem);
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  color: var(--brown);
+  line-height: 1;
+}
+
+.logo span { color: var(--gold); font-style: italic; }
+
+.tagline {
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  color: var(--muted);
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tab {
+  flex: 1;
+  padding: 14px 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.tab.active { color: var(--brown); border-bottom-color: var(--gold); }
+.tab:hover:not(.active) { color: var(--dark); }
+
+/* ── Panels ── */
+.panel { display: none; padding: 24px 16px; max-width: 720px; margin: 0 auto; }
+.panel.active { display: block; }
+
+/* ── API Setup ── */
+.setup-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.setup-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--brown);
+  margin-bottom: 6px;
+}
+.setup-card p { font-size: 0.65rem; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+.setup-card a { color: var(--gold); }
+
+input[type=text], input[type=password], textarea {
+  width: 100%;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, textarea:focus { border-color: var(--gold); }
+textarea { resize: vertical; min-height: 80px; }
+
+.label {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.field { margin-bottom: 16px; }
+
+/* ── Buttons ── */
+.btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--brown);
+  padding: 11px 22px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.btn:hover { background: var(--warm); border-color: var(--gold); }
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: var(--cream);
+}
+.btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+
+.btn-gold {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--dark);
+  font-weight: 500;
+}
+.btn-gold:hover { background: var(--gold-light); }
+
+.btn-sm { padding: 6px 12px; font-size: 0.58rem; }
+
+/* ── Wardrobe Grid ── */
+.add-item-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.add-item-form h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--brown);
+  margin-bottom: 16px;
+}
+
+.photo-upload {
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  margin-bottom: 14px;
+  position: relative;
+}
+.photo-upload:hover { border-color: var(--gold); }
+.photo-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.photo-upload-icon { font-size: 2rem; margin-bottom: 8px; }
+.photo-upload p { font-size: 0.62rem; color: var(--muted); }
+.photo-preview {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: none;
+}
+
+.hashtag-input-wrap { position: relative; }
+.hashtag-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 5;
+  display: none;
+}
+.hashtag-suggestions span {
+  display: block;
+  padding: 7px 14px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+.hashtag-suggestions span:hover { background: var(--warm); color: var(--dark); }
+
+.tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tag {
+  background: var(--warm);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.6rem;
+  color: var(--brown);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.tag-del { cursor: pointer; color: var(--muted); font-size: 0.8rem; line-height: 1; }
+.tag-del:hover { color: var(--accent); }
+
+/* Wardrobe grid */
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--brown);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.section-title small { font-family: 'DM Mono'; font-size: 0.6rem; color: var(--muted); }
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.filter-tag {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-tag.active { background: var(--brown); border-color: var(--brown); color: var(--cream); }
+
+.wardrobe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.item-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  animation: fadeUp 0.3s ease;
+}
+@keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
+
+.item-card:hover { border-color: var(--gold); box-shadow: 0 4px 16px var(--shadow); transform: translateY(-2px); }
+.item-card.selected { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); }
+
+.item-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+  background: var(--warm);
+}
+
+.item-card-body { padding: 8px 10px; }
+.item-card-name { font-size: 0.65rem; color: var(--dark); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-card-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.item-card-tag { font-size: 0.5rem; color: var(--muted); }
+
+.item-del-btn {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 22px; height: 22px;
+  background: rgba(26,22,18,0.7);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.item-card:hover .item-del-btn { display: flex; }
+
+.empty-state {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+}
+
+/* ── Outfit Generator ── */
+.generator-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.generator-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--brown);
+  margin-bottom: 16px;
+}
+
+.mood-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.mood-chip {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.mood-chip.active { background: var(--brown); border-color: var(--brown); color: var(--cream); }
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.weather-btn {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 6px;
+  background: var(--cream);
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.55rem;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.weather-btn .wi { font-size: 1.4rem; }
+.weather-btn.active { border-color: var(--gold); background: var(--warm); color: var(--brown); }
+
+/* Result */
+.result-section {
+  display: none;
+  animation: fadeUp 0.4s ease;
+}
+.result-section.visible { display: block; }
+
+.result-image {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+  background: var(--warm);
+  min-height: 200px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.result-description {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  padding: 16px 18px;
+  font-size: 0.72rem;
+  line-height: 1.8;
+  color: var(--dark);
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+}
+
+.result-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.result-item-tag {
+  background: var(--warm);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 0.6rem;
+  color: var(--brown);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px 20px;
+  display: none;
+}
+.loading-state.visible { display: block; }
+.spinner {
+  width: 36px; height: 36px;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.15em; }
+
+/* Status */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--warm);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.58rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.status-dot.ok { background: #5a9e6e; }
+.status-dot.err { background: #c0392b; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ARMA<span>dio</span> AI</div>
+  <div class="tagline">Il tuo stylist personale con intelligenza artificiale</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('setup')">⚙ Setup</button>
+  <button class="tab" onclick="showTab('wardrobe')">👗 Guardaroba</button>
+  <button class="tab" onclick="showTab('outfit')">✨ Outfit</button>
+</div>
+
+<!-- ── SETUP ── -->
+<div class="panel active" id="panel-setup">
+  <div class="setup-card">
+    <h3>API Keys</h3>
+    <p>Inserisci le tue chiavi API. Vengono salvate solo sul tuo dispositivo (localStorage) e non vengono mai inviate altrove.</p>
+
+    <div class="field">
+      <span class="label">Replicate API Key</span>
+      <input type="password" id="replicateKey" placeholder="r8_xxxxxxxxxxxx" oninput="saveKeys()">
+      <p style="font-size:0.58rem;color:var(--muted);margin-top:6px">
+        Ottieni gratis su <a href="https://replicate.com" target="_blank">replicate.com</a> → Account → API tokens
+      </p>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn btn-primary" onclick="testKeys()">Testa connessione</button>
+      <div class="status-pill" id="apiStatus">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Non verificato</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="setup-card">
+    <h3>Come funziona</h3>
+    <p>
+      1. <strong>Aggiungi</strong> i tuoi capi nel Guardaroba con foto e hashtag<br>
+      2. <strong>Vai su Outfit</strong>, scegli il tuo mood e le condizioni meteo<br>
+      3. <strong>L'AI</strong> analizza il tuo guardaroba e genera un outfit pertinente<br>
+      4. <strong>Ottieni</strong> descrizione testuale + immagine generata dell'outfit
+    </p>
+  </div>
+</div>
+
+<!-- ── WARDROBE ── -->
+<div class="panel" id="panel-wardrobe">
+
+  <div class="add-item-form">
+    <h3>Aggiungi un capo</h3>
+
+    <div class="photo-upload" id="photoUploadArea">
+      <input type="file" accept="image/*" onchange="handlePhoto(this)">
+      <img class="photo-preview" id="photoPreview">
+      <div id="photoPlaceholder">
+        <div class="photo-upload-icon">📷</div>
+        <p>Tocca per scattare/scegliere una foto</p>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="label">Nome capo</span>
+      <input type="text" id="itemName" placeholder="es. Camicia bianca Oxford">
+    </div>
+
+    <div class="field">
+      <span class="label">Hashtag</span>
+      <div class="hashtag-input-wrap">
+        <input type="text" id="tagInput" placeholder="#casual #estate #lavoro..." onkeydown="handleTagKey(event)" oninput="showSuggestions(this.value)">
+        <div class="hashtag-suggestions" id="tagSuggestions"></div>
+      </div>
+      <div class="tags-display" id="tagsDisplay"></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="addItem()" style="width:100%">+ Aggiungi al guardaroba</button>
+  </div>
+
+  <div class="section-title">
+    Guardaroba
+    <small id="itemCount">0 capi</small>
+  </div>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-tag active" onclick="filterItems('all', this)">Tutti</button>
+  </div>
+
+  <div class="wardrobe-grid" id="wardrobeGrid">
+    <div class="empty-state">Nessun capo ancora.<br>Aggiungi il primo usando il form qui sopra.</div>
+  </div>
+</div>
+
+<!-- ── OUTFIT ── -->
+<div class="panel" id="panel-outfit">
+
+  <div class="generator-card">
+    <h3>Come ti senti oggi?</h3>
+    <div class="mood-chips" id="moodChips">
+      <button class="mood-chip" onclick="toggleMood(this)">💼 Professionale</button>
+      <button class="mood-chip" onclick="toggleMood(this)">😎 Casual</button>
+      <button class="mood-chip" onclick="toggleMood(this)">🌹 Romantico</button>
+      <button class="mood-chip" onclick="toggleMood(this)">🎉 Festoso</button>
+      <button class="mood-chip" onclick="toggleMood(this)">🏃 Sportivo</button>
+      <button class="mood-chip" onclick="toggleMood(this)">🎨 Creativo</button>
+      <button class="mood-chip" onclick="toggleMood(this)">😌 Rilassato</button>
+      <button class="mood-chip" onclick="toggleMood(this)">🔥 Audace</button>
+    </div>
+    <div class="field">
+      <span class="label">Descrivi il tuo mood (opzionale)</span>
+      <textarea id="moodText" placeholder="es. Ho una cena importante, voglio essere elegante ma non troppo formale..."></textarea>
+    </div>
+  </div>
+
+  <div class="generator-card">
+    <h3>Meteo di oggi</h3>
+    <div class="weather-grid">
+      <button class="weather-btn" onclick="selectWeather(this, 'sole caldo')">
+        <span class="wi">☀️</span> Sole
+      </button>
+      <button class="weather-btn" onclick="selectWeather(this, 'nuvoloso mite')">
+        <span class="wi">⛅</span> Nuvoloso
+      </button>
+      <button class="weather-btn" onclick="selectWeather(this, 'pioggia')">
+        <span class="wi">🌧️</span> Pioggia
+      </button>
+      <button class="weather-btn" onclick="selectWeather(this, 'freddo invernale')">
+        <span class="wi">❄️</span> Freddo
+      </button>
+      <button class="weather-btn" onclick="selectWeather(this, 'caldo afoso estivo')">
+        <span class="wi">🌡️</span> Caldo
+      </button>
+      <button class="weather-btn" onclick="selectWeather(this, 'vento fresco')">
+        <span class="wi">💨</span> Ventoso
+      </button>
+      <button class="weather-btn" onclick="selectWeather(this, 'nebbia umida')">
+        <span class="wi">🌫️</span> Nebbia
+      </button>
+      <button class="weather-btn" onclick="selectWeather(this, 'temporale')">
+        <span class="wi">⛈️</span> Temporale
+      </button>
+    </div>
+  </div>
+
+  <button class="btn btn-gold" onclick="generateOutfit()" style="width:100%;padding:16px;font-size:0.75rem;margin-bottom:24px">
+    ✨ GENERA IL MIO OUTFIT
+  </button>
+
+  <div class="loading-state" id="loadingState">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Analizzo il tuo guardaroba...</div>
+  </div>
+
+  <div class="result-section" id="resultSection">
+    <div class="section-title">Il tuo outfit di oggi</div>
+    <img class="result-image" id="resultImage" src="" alt="Outfit generato">
+    <div class="result-description" id="resultDescription"></div>
+    <div class="result-items" id="resultItems"></div>
+    <button class="btn" onclick="generateOutfit()" style="width:100%">↻ Rigenera</button>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let wardrobe = JSON.parse(localStorage.getItem('wardrobe') || '[]');
+let currentTags = [];
+let selectedWeather = '';
+let selectedMoods = [];
+
+const COMMON_TAGS = ['#casual','#formale','#estate','#inverno','#primavera','#autunno',
+  '#lavoro','#sera','#sport','#streetwear','#elegante','#basic',
+  '#top','#bottom','#scarpe','#accessorio','#giacca','#vestito'];
+
+// ── Tabs ───────────────────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'wardrobe') renderWardrobe();
+}
+
+// ── Keys ───────────────────────────────────────────────────────────────────────
+function saveKeys() {
+  localStorage.setItem('replicateKey', document.getElementById('replicateKey').value.trim());
+}
+
+function loadKeys() {
+  const rk = localStorage.getItem('replicateKey') || '';
+  document.getElementById('replicateKey').value = rk;
+}
+
+async function testKeys() {
+  const key = document.getElementById('replicateKey').value.trim();
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  if (!key) { dot.className='status-dot err'; txt.textContent='Inserisci la chiave'; return; }
+  txt.textContent = 'Verifico...'; dot.className='status-dot';
+  try {
+    // Just check if key format is right (r8_...)
+    if (key.startsWith('r8_') && key.length > 10) {
+      dot.className='status-dot ok'; txt.textContent='Chiave valida ✓';
+    } else {
+      dot.className='status-dot err'; txt.textContent='Formato non valido';
+    }
+  } catch(e) {
+    dot.className='status-dot err'; txt.textContent='Errore: ' + e.message;
+  }
+}
+
+// ── Photo ──────────────────────────────────────────────────────────────────────
+function handlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById('photoPreview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    document.getElementById('photoPlaceholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Tags ───────────────────────────────────────────────────────────────────────
+function handleTagKey(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    const val = e.target.value.trim();
+    if (val) { addTag(val); e.target.value = ''; hideSuggestions(); }
+  }
+}
+
+function addTag(tag) {
+  if (!tag.startsWith('#')) tag = '#' + tag;
+  tag = tag.toLowerCase().replace(/\s+/g,'');
+  if (!currentTags.includes(tag)) {
+    currentTags.push(tag);
+    renderTags();
+  }
+}
+
+function removeTag(tag) {
+  currentTags = currentTags.filter(t => t !== tag);
+  renderTags();
+}
+
+function renderTags() {
+  const display = document.getElementById('tagsDisplay');
+  display.innerHTML = currentTags.map(t =>
+    `<div class="tag">${t} <span class="tag-del" onclick="removeTag('${t}')">×</span></div>`
+  ).join('');
+}
+
+function showSuggestions(val) {
+  const box = document.getElementById('tagSuggestions');
+  if (!val) { hideSuggestions(); return; }
+  const matches = COMMON_TAGS.filter(t => t.includes(val.toLowerCase()) && !currentTags.includes(t));
+  if (!matches.length) { hideSuggestions(); return; }
+  box.style.display = 'block';
+  box.innerHTML = matches.slice(0,5).map(t =>
+    `<span onclick="addTag('${t}'); document.getElementById('tagInput').value=''; hideSuggestions()">${t}</span>`
+  ).join('');
+}
+function hideSuggestions() { document.getElementById('tagSuggestions').style.display='none'; }
+
+// ── Wardrobe ───────────────────────────────────────────────────────────────────
+function addItem() {
+  const name = document.getElementById('itemName').value.trim();
+  const photo = document.getElementById('photoPreview').src;
+  if (!name) { alert('Inserisci il nome del capo'); return; }
+
+  const item = {
+    id: Date.now(),
+    name,
+    photo: photo.startsWith('data:') ? photo : '',
+    tags: [...currentTags]
+  };
+  wardrobe.push(item);
+  saveWardrobe();
+
+  // Reset form
+  document.getElementById('itemName').value = '';
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoPlaceholder').style.display = 'block';
+  document.getElementById('photoPreview').src = '';
+  currentTags = [];
+  renderTags();
+
+  renderWardrobe();
+  showTab('wardrobe'); // switch to wardrobe tab visually
+}
+
+function saveWardrobe() {
+  // Store without full base64 images if too large — store thumb
+  try {
+    localStorage.setItem('wardrobe', JSON.stringify(wardrobe));
+  } catch(e) {
+    // Storage full — store without photos
+    const slim = wardrobe.map(i => ({...i, photo: i.photo.substring(0, 5000)}));
+    localStorage.setItem('wardrobe', JSON.stringify(slim));
+  }
+}
+
+function deleteItem(id) {
+  wardrobe = wardrobe.filter(i => i.id !== id);
+  saveWardrobe();
+  renderWardrobe();
+}
+
+let activeFilter = 'all';
+function filterItems(tag, btn) {
+  activeFilter = tag;
+  document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderWardrobe(false);
+}
+
+function renderWardrobe(rebuildFilters = true) {
+  const grid = document.getElementById('wardrobeGrid');
+  const count = document.getElementById('itemCount');
+  count.textContent = wardrobe.length + ' cap' + (wardrobe.length===1?'o':'i');
+
+  if (rebuildFilters) {
+    const allTags = [...new Set(wardrobe.flatMap(i => i.tags))].sort();
+    const bar = document.getElementById('filterBar');
+    bar.innerHTML = `<button class="filter-tag ${activeFilter==='all'?'active':''}" onclick="filterItems('all',this)">Tutti</button>`;
+    allTags.forEach(t => {
+      bar.innerHTML += `<button class="filter-tag ${activeFilter===t?'active':''}" onclick="filterItems('${t}',this)">${t}</button>`;
+    });
+  }
+
+  const filtered = activeFilter === 'all' ? wardrobe : wardrobe.filter(i => i.tags.includes(activeFilter));
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state">${wardrobe.length ? 'Nessun capo con questo tag.' : 'Nessun capo ancora.<br>Aggiungi il primo usando il form qui sopra.'}</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => `
+    <div class="item-card" id="card-${item.id}">
+      ${item.photo
+        ? `<img src="${item.photo}" alt="${item.name}" loading="lazy">`
+        : `<div style="height:140px;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:2rem">👗</div>`
+      }
+      <button class="item-del-btn" onclick="deleteItem(${item.id})">×</button>
+      <div class="item-card-body">
+        <div class="item-card-name">${item.name}</div>
+        <div class="item-card-tags">${item.tags.map(t=>`<span class="item-card-tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Mood / Weather ─────────────────────────────────────────────────────────────
+function toggleMood(btn) {
+  const mood = btn.textContent.trim();
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+    selectedMoods = selectedMoods.filter(m => m !== mood);
+  } else {
+    btn.classList.add('active');
+    selectedMoods.push(mood);
+  }
+}
+
+function selectWeather(btn, weather) {
+  document.querySelectorAll('.weather-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedWeather = weather;
+}
+
+// ── Generate Outfit ────────────────────────────────────────────────────────────
+async function generateOutfit() {
+  if (wardrobe.length === 0) {
+    alert('Aggiungi almeno un capo al guardaroba prima!');
+    showTab('wardrobe');
+    return;
+  }
+
+  const replicateKey = localStorage.getItem('replicateKey') || '';
+  if (!replicateKey) {
+    alert('Inserisci la tua Replicate API key nel tab Setup!');
+    showTab('setup');
+    return;
+  }
+
+  const moodText = document.getElementById('moodText').value.trim();
+  const moodDesc = [
+    selectedMoods.length ? 'Mood: ' + selectedMoods.join(', ') : '',
+    selectedWeather ? 'Meteo: ' + selectedWeather : '',
+    moodText || ''
+  ].filter(Boolean).join('. ');
+
+  if (!moodDesc) {
+    alert('Scegli almeno un mood o il meteo!');
+    return;
+  }
+
+  // Show loading
+  document.getElementById('loadingState').classList.add('visible');
+  document.getElementById('resultSection').classList.remove('visible');
+
+  // Build wardrobe description for Claude
+  const wardrobeDesc = wardrobe.map(i =>
+    `- ${i.name} [${i.tags.join(', ')}]`
+  ).join('\n');
+
+  // Build messages with photos if available
+  const itemsWithPhotos = wardrobe.filter(i => i.photo && i.photo.startsWith('data:'));
+
+  let claudeContent = [];
+
+  // Add photos (up to 5 to avoid token limits)
+  itemsWithPhotos.slice(0, 5).forEach(item => {
+    const [header, b64] = item.photo.split(',');
+    const mime = header.match(/:(.*?);/)[1];
+    claudeContent.push({
+      type: 'image',
+      source: { type: 'base64', media_type: mime, data: b64 }
+    });
+    claudeContent.push({ type: 'text', text: `[Foto: ${item.name} — tag: ${item.tags.join(', ')}]` });
+  });
+
+  claudeContent.push({
+    type: 'text',
+    text: `Sei un personal stylist esperto.
+
+Il mio guardaroba completo:
+${wardrobeDesc}
+
+Situazione di oggi: ${moodDesc}
+
+Analizza il guardaroba e proponi il miglior outfit per oggi. Rispondi in italiano con:
+1. OUTFIT CONSIGLIATO: elenca i capi specifici da indossare (nome e perché)
+2. COME INDOSSARLO: consigli pratici su come abbinare e portare l'outfit
+3. PROMPT IMMAGINE: scrivi un prompt in inglese (max 60 parole) per generare un'immagine fashion dell'outfit, stile editorial photography, su sfondo neutro
+
+Formatta con queste 3 sezioni chiaramente separate.`
+  });
+
+  try {
+    // Step 1: Claude analyzes wardrobe
+    setLoadingText('✦ Analizzo il tuo guardaroba con Claude AI...');
+
+    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: claudeContent }]
+      })
+    });
+
+    const claudeData = await claudeRes.json();
+    const claudeText = claudeData.content?.find(b => b.type === 'text')?.text || '';
+
+    if (!claudeText) throw new Error('Claude non ha risposto');
+
+    // Parse sections
+    const outfitMatch = claudeText.match(/OUTFIT CONSIGLIATO[:\s]*([\s\S]*?)(?=COME INDOSSARLO|PROMPT|$)/i);
+    const howMatch = claudeText.match(/COME INDOSSARLO[:\s]*([\s\S]*?)(?=PROMPT|$)/i);
+    const promptMatch = claudeText.match(/PROMPT IMMAGINE[:\s]*([\s\S]*?)$/i);
+
+    const outfitText = outfitMatch ? outfitMatch[1].trim() : claudeText;
+    const howText = howMatch ? howMatch[1].trim() : '';
+    const imagePrompt = promptMatch ? promptMatch[1].trim() : '';
+
+    const fullDescription = [outfitText, howText ? '\n\n' + howText : ''].join('');
+    document.getElementById('resultDescription').textContent = fullDescription;
+
+    // Step 2: Generate image with Replicate
+    setLoadingText('🎨 Genero l\'immagine dell\'outfit...');
+
+    const finalPrompt = imagePrompt
+      ? `${imagePrompt}, high fashion editorial photography, clean white background, professional lighting, full outfit visible, photorealistic`
+      : `${moodDesc} fashion outfit, editorial photography, clean background, professional lighting, photorealistic`;
+
+    const replicateRes = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${replicateKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'wait'
+      },
+      body: JSON.stringify({
+        input: {
+          prompt: finalPrompt,
+          width: 768,
+          height: 1024,
+          num_outputs: 1,
+          num_inference_steps: 4
+        }
+      })
+    });
+
+    const repData = await replicateRes.json();
+
+    let imageUrl = null;
+
+    if (repData.output && repData.output[0]) {
+      imageUrl = repData.output[0];
+    } else if (repData.urls?.get) {
+      // Poll for result
+      setLoadingText('⏳ Elaboro l\'immagine...');
+      imageUrl = await pollReplicate(repData.urls.get, replicateKey);
+    }
+
+    // Show result
+    document.getElementById('loadingState').classList.remove('visible');
+    document.getElementById('resultSection').classList.add('visible');
+
+    if (imageUrl) {
+      document.getElementById('resultImage').src = imageUrl;
+      document.getElementById('resultImage').style.display = 'block';
+    } else {
+      document.getElementById('resultImage').style.display = 'none';
+    }
+
+  } catch(e) {
+    document.getElementById('loadingState').classList.remove('visible');
+    alert('Errore: ' + e.message + '\n\nControlla la tua API key Replicate nel tab Setup.');
+    console.error(e);
+  }
+}
+
+async function pollReplicate(url, key, maxAttempts = 30) {
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 2000));
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${key}` } });
+    const data = await res.json();
+    if (data.status === 'succeeded' && data.output?.[0]) return data.output[0];
+    if (data.status === 'failed') throw new Error('Generazione immagine fallita');
+    setLoadingText(`⏳ Genero immagine... (${i+1}/${maxAttempts})`);
+  }
+  throw new Error('Timeout generazione immagine');
+}
+
+function setLoadingText(t) {
+  document.getElementById('loadingText').textContent = t;
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+loadKeys();
+renderWardrobe();
+</script>
+</body>
+</html>
